@@ -1,32 +1,3 @@
-const char* WPiece[8] = 
-{"      ###       ",
-"    ########     ",
-"  ############   ",
-" ###### #######  ",
-" ####### ######  ",
-"  ############   ",
-"   #########     ",
-"      ###        "};
-
-const char* BPiece[8] = 
-{"     @@@        ",
-"   @@@@@@@@@    ",
-"  @@@@@@@@@@@@  ",
-" @@@@@@ @@@@@@@ ",
-" @@@@@@ @@@@@@@ ",
-"  @@@@@@@@@@@@  ",
-"   @@@@@@@@@    ",
-"      @@@       "};
-
-const char* NPiece[8] = 
-{" ************** ",
-" *            * ",
-" *            * ",
-" *            * ",
-" *            * ",
-" *            * ",
-" *            * ",
-" ************** "};
 
 class Draw {
 public:
@@ -50,7 +21,7 @@ Draw::~Draw() {
 
 Draw::Draw( Board& boardref, Position& select ):
     board{ boardref },
-    frame{ new char[12444] },
+    frame{ new char[44000] },
     PositionSelection{ select }
 {}
 
@@ -58,39 +29,79 @@ inline void Draw::DrawingPiece() {
     size_t counter = 0;
     
     for ( size_t i=0; i < H; ++i ) {
-        for ( size_t par=0; par < H; ++par ) {
+        for ( size_t par=0; par < P; ++par ) {
             for ( size_t j=0; j < W; ++j ) {
 
-                if ( PositionSelection.x == i && PositionSelection.y == j ) {
-                    strcpy(frame + counter, "\u001b[34m " );
-                    counter += 6;
-                } else {
-                    strcpy(frame + counter, "\u001b[0m " );
+                if ( PositionSelection.currentPosibleMoves[i][j] == true ) {
+                    strcpy(frame + counter, "\u001b[30m" );
+                    counter += 5;
+                }
+
+                else if ( PositionSelection.cusorX == i && PositionSelection.cusorY == j && PositionSelection.selectTarget == true ) {
+                    strcpy(frame + counter, "\u001b[36m" );
+                    counter += 5;
+                }
+            
+                else if ( PositionSelection.cusorX == i && PositionSelection.cusorY  == j ) {
+                    strcpy(frame + counter, "\u001b[34m" );
+                    counter += 5;
+                } 
+               
+                else if ( board[i][j].pieceName == WHITE ) {
+                    strcpy(frame + counter, "\u001b[32m" );
+                    counter += 5;
+                }
+                else if ( board[i][j].pieceName == BLACK ) {
+                    strcpy(frame + counter, "\u001b[31m" );
                     counter += 5;
                 }
 
                 {
-                    switch (board[i][j]) {
-                        case WHITE:
-                            strcpy(frame + counter, WPiece[par]);
-                            counter += 16; 
+                    switch (board[i][j].typeName) {
+                        case TOWER:
+                            strcpy(frame + counter, tower[par]);
+                            counter += 31; 
                             break;    
-                        case BLACK:
-                            strcpy(frame + counter, BPiece[par]);
-                            counter += 16;   
-                            break;   
-                        case NONE:
-                            strcpy(frame + counter, NPiece[par]);
-                            counter += 16;            
+                        case KNIGHT:
+                            strcpy(frame + counter, knight[par]);
+                            counter += 31;   
+                            break;
+                        case BISHOP:
+                            strcpy(frame + counter, bishop[par]);
+                            counter += 31;   
+                            break;
+                        case QUEEN:
+                            strcpy(frame + counter, queen[par]);
+                            counter += 31;   
+                            break;
+                        case KING:
+                            strcpy(frame + counter, king[par]);
+                            counter += 31;   
+                            break;
+                        case PAWN:
+                            strcpy(frame + counter, pawn[par]);
+                            counter += 31;   
+                            break;                       
+                        case ENPTY:
+                            strcpy(frame + counter, enpty[par]);
+                            counter += 31;            
                             break;   
                         default:
                             break;
                     }
                 }
+
+                if (i != 7) {
+                    strcpy(frame + counter, "\u001b[0m" );
+                    counter += 4;
+                } 
             }
             frame[counter] = '\n';
             counter += 1;
         }
+
+        frame[counter] = '\n';
+        counter += 1;
     }
 }
 
