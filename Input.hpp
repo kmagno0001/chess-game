@@ -20,7 +20,7 @@ inline void Input::eventLoop() {
             case 'w':
                 if ( !(positionSelection.cusorX < 1) && positionSelection.lockSelection == false ) {
                     positionSelection.cusorX -= 1;
-                } else if (positionSelection.currentPosibleMoves[(!(positionSelection.cusorX < 1) ? positionSelection.cusorX : positionSelection.cusorX - 1 )][positionSelection.cusorY] == true) {
+                } else if (positionSelection.currentPosibleMoves[(!(positionSelection.cusorX < 1) ? positionSelection.cusorX : positionSelection.cusorX )][positionSelection.cusorY] == true) {
                     positionSelection.cusorX -= 1;
                 }
 
@@ -29,7 +29,7 @@ inline void Input::eventLoop() {
             case 'a':
                 if ( !(positionSelection.cusorY < 1) && positionSelection.lockSelection == false ) {
                     positionSelection.cusorY -= 1;
-                } else if (positionSelection.currentPosibleMoves[positionSelection.cusorX][(!(positionSelection.cusorY < 1) ? positionSelection.cusorY : positionSelection.cusorY + 1 )] == true) {
+                } else if (positionSelection.currentPosibleMoves[positionSelection.cusorX][(!(positionSelection.cusorY < 1) ? positionSelection.cusorY : positionSelection.cusorY )] == true) {
                     positionSelection.cusorY -= 1;
                 }
                 break;
@@ -37,15 +37,16 @@ inline void Input::eventLoop() {
             case 'd':
                 if ( !(positionSelection.cusorY > 6) && positionSelection.lockSelection == false ) {
                     positionSelection.cusorY += 1;
-                } else if (positionSelection.currentPosibleMoves[positionSelection.cusorX][(!(positionSelection.cusorY < 1) ? positionSelection.cusorY : positionSelection.cusorY - 1 )] == true) {
+                } else if (positionSelection.currentPosibleMoves[positionSelection.cusorX][(!(positionSelection.cusorY > 6) ? positionSelection.cusorY : positionSelection.cusorY )] == true) {
                     positionSelection.cusorY += 1;
                 }
                 break;
 
             case 's':
-                if ( !(positionSelection.cusorX > 6) && positionSelection.lockSelection == false ) {
+                if ( !(positionSelection.cusorX > 6) && 
+                       positionSelection.lockSelection == false ) {
                     positionSelection.cusorX += 1;
-                } else if (positionSelection.currentPosibleMoves[(!(positionSelection.cusorX < 1) ? positionSelection.cusorX : positionSelection.cusorX + 1 )][positionSelection.cusorY] == true) {
+                } else if (positionSelection.currentPosibleMoves[(!(positionSelection.cusorX > 6) ? positionSelection.cusorX : positionSelection.cusorX )][positionSelection.cusorY] == true) {
                     positionSelection.cusorX += 1;
                 }
                 break;

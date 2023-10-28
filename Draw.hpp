@@ -2,7 +2,7 @@
 class Draw {
 public:
     ~Draw();
-    Draw( Board& boardref, Position& select );
+    Draw(Board& boardref, Position& select );
 
     inline void DrawingOnScreen();
     inline void clearScreen();
@@ -19,7 +19,7 @@ Draw::~Draw() {
     delete frame;
 }
 
-Draw::Draw( Board& boardref, Position& select ):
+Draw::Draw(Board& boardref, Position& select ):
     board{ boardref },
     frame{ new char[44000] },
     PositionSelection{ select }
@@ -33,7 +33,7 @@ inline void Draw::DrawingPiece() {
             for ( size_t j=0; j < W; ++j ) {
 
                 if ( PositionSelection.currentPosibleMoves[i][j] == true ) {
-                    strcpy(frame + counter, "\u001b[30m" );
+                    strcpy(frame + counter, "\u001b[42m" );
                     counter += 5;
                 }
 
@@ -42,7 +42,7 @@ inline void Draw::DrawingPiece() {
                     counter += 5;
                 }
             
-                else if ( PositionSelection.cusorX == i && PositionSelection.cusorY  == j ) {
+                else if ( PositionSelection.cusorX == i && PositionSelection.cusorY == j ) {
                     strcpy(frame + counter, "\u001b[34m" );
                     counter += 5;
                 } 
@@ -109,7 +109,8 @@ inline void Draw::DrawingOnScreen() {
     std::thread thread (&Draw::DrawingPiece, this);
     thread.join();
    
-    std::cout << frame;
+    std::cout << frame << '\n';
+    std::cout << PositionSelection.cusorX << " " << PositionSelection.cusorY;
 }
 
 inline void Draw::clearScreen() {
@@ -121,8 +122,4 @@ inline void Draw::clearScreen() {
     Position.X = 0;
     Position.Y = 0;
     SetConsoleCursorPosition(hOut, Position);
-}
-
-inline void Draw::insertSelectDraw() {
-    
 }

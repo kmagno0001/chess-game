@@ -1,8 +1,9 @@
 #pragma once
 
 enum Round {
-    WHITEROUND,
-    BLACKROUND,
+    SELECTPIECE,
+    MOVEPIECE,
+    SWAPKILLPIECE
 };
 
 enum Piece { 
@@ -24,7 +25,6 @@ enum Type {
 struct ChessBoard {
     Piece pieceName {NONE};
     Type typeName {ENPTY};
-
 };
 
 

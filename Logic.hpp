@@ -18,13 +18,22 @@ private:
     Draw draw;
     Input input;
 
-
     inline Type fillBoard( size_t row, size_t col );
-    inline void movement();    
+    inline void movement(); 
+    inline void clearMovement();   
 };
 
 Logic::Logic():
-    positionSelection{ true, WHITEROUND, NULL, NULL, false, false},
+    positionSelection{ true, SELECTPIECE, 0, 0, false, false, 100, 100, 200, 200,{
+        {0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0},
+    } },
     draw{ board, positionSelection },
     input{ board, positionSelection }
 {
@@ -56,42 +65,45 @@ inline void Logic::GameOn() {
 }
 
 inline void Logic::gameRound() {
-    switch ( positionSelection.currentRound )
-    {
-    case WHITEROUND:
-        if ( positionSelection.selectTarget == true ) {
-            positionSelection.coordTargetX = positionSelection.cusorX;
-            positionSelection.coordTargetY = positionSelection.cusorY;
-            positionSelection.lockSelection = true;
-        } else {
-
-            if ((positionSelection.coordTargetX == positionSelection.cusorX && positionSelection.coordTargetY == positionSelection.cusorY) 
-            || (positionSelection.coordTargetX == NULL && positionSelection.coordTargetY == NULL)) {
-                positionSelection.lockSelection = false;
-                return;
+    switch ( positionSelection.currentRound ) {
+        case Round::SELECTPIECE:
+            if (positionSelection.selectTarget == true && board[positionSelection.cusorX][positionSelection.cusorY].pieceName == WHITE) {
+                positionSelection.currentRound = Round::MOVEPIECE;
+                positionSelection.coordTargetX = positionSelection.cusorX;
+                positionSelection.coordTargetY = positionSelection.cusorY;
             }
 
-            size_t x = positionSelection.cusorX;
-            size_t y = positionSelection.cusorY;
+            break;
 
-            auto tmp = board[x][y];
-            board[x][y] = board[positionSelection.coordTargetX][positionSelection.coordTargetY];
-            board[positionSelection.coordTargetX][positionSelection.coordTargetY] = tmp;
-        }
+        case Round::MOVEPIECE:
+            if (positionSelection.selectTarget == false && 
+               ( positionSelection.cusorX == positionSelection.coordTargetX && positionSelection.cusorY == positionSelection.coordTargetY )) {
+                positionSelection.currentRound = Round::SELECTPIECE;
+                positionSelection.lockSelection = false;
+                clearMovement();
+                break;
+            }
 
-        break;
-
-    case BLACKROUND:
-        if ( positionSelection.selectTarget == true ) {
-            positionSelection.coordTargetX = positionSelection.cusorX;
-            positionSelection.coordTargetY = positionSelection.cusorY;
             positionSelection.lockSelection = true;
-        }
+            movement();  
 
-        break;
-    
-    default:
-        break;
+            if (positionSelection.selectTarget == false && positionSelection.lockSelection == true) {
+                positionSelection.moveTargetX = positionSelection.cusorX;
+                positionSelection.moveTargetY = positionSelection.cusorY;
+                positionSelection.currentRound = Round::SWAPKILLPIECE;
+                positionSelection.lockSelection = false;
+                clearMovement();
+            }  
+
+            break;
+
+        case  Round::SWAPKILLPIECE:
+            if (board[positionSelection.moveTargetX][positionSelection.moveTargetY].pieceName == NONE) {
+                std::swap(board[positionSelection.moveTargetX][positionSelection.moveTargetY], board[positionSelection.coordTargetX][positionSelection.coordTargetY]);
+                positionSelection.currentRound = Round::SELECTPIECE;
+            }
+
+            break;       
     }
 }
 
@@ -125,7 +137,7 @@ inline Type Logic::fillBoard( size_t row, size_t col) {
             break;
     }
 
-    switch (row){
+    switch (row) {
         case 1:
         case 6:
             retTy = PAWN;
@@ -139,19 +151,17 @@ inline Type Logic::fillBoard( size_t row, size_t col) {
 }
 
 inline void Logic::movement() {
-    memset(positionSelection.currentPosibleMoves, false, 64);
-
     switch ( board[positionSelection.coordTargetX][positionSelection.coordTargetY].typeName )
     {
         case TOWER:
             for ( size_t i=0; i < H; ++i) {
                 for ( size_t j=0; j < W; ++j) {
                     if ( positionSelection.coordTargetX == i ) {
-                        positionSelection.currentPosibleMoves[i][j] = true; 
-                      
+                        positionSelection.currentPosibleMoves[positionSelection.coordTargetX][j] = true;   
                     }
-                    if (positionSelection.coordTargetY == j ) {
-                        positionSelection.currentPosibleMoves[i][j] = true; 
+
+                    if ( positionSelection.coordTargetY == j ) {
+                        positionSelection.currentPosibleMoves[i][positionSelection.coordTargetY] = true; 
                     }
                 }
             } 
@@ -166,9 +176,18 @@ inline void Logic::movement() {
         case KING: 
             break;
         case PAWN:
+            positionSelection.currentPosibleMoves[positionSelection.coordTargetX ][positionSelection.coordTargetY] = true; 
             positionSelection.currentPosibleMoves[positionSelection.coordTargetX + 1][positionSelection.coordTargetY] = true; 
             break;              
     default:
         break;
+    }
+}
+
+inline void Logic::clearMovement() {
+    for (size_t i=0; i < H; ++i) {
+        for (size_t j=0; j < W; ++j) {
+            positionSelection.currentPosibleMoves[i][j] = false;
+        }
     }
 }
